@@ -3,6 +3,7 @@ from django.urls import resolve
 from lists.views import home_page
 from django.http import HttpRequest
 from django.template.loader import render_to_string
+from lists.models import Item
 
 
 # Create your tests here.
@@ -32,3 +33,24 @@ class HomePageTest(TestCase):
         #检查post请求渲染得到的html中是否有指定的文本
         self.assertIn('A new list item',response.content.decode())
         self.assertTemplateUsed(response, 'home.html')  # 检查是否依然使用这个模板
+
+
+class ItemModelTest(TestCase):
+    def test_saving_and_retrieving_items(self):
+        #	3. 在数据库中创建新纪录：创建一个对象；为一些属性赋值；调用.save()函数
+        first_item = Item()
+        first_item.text = 'The first (ever) list item'
+        first_item.save()
+
+        second_item = Item()
+        second_item.text = 'Item the second'
+        second_item.save()
+
+        #django提供了一个查询数据库的API,即类.objects，.all()是查询方法，返回类似列表的对象，叫QuerySet
+        saved_items = Item.objects.all()
+        self.assertEqual(saved_items.count(),2)
+        first_saved_item = saved_items[0]
+        second_saved_item = saved_items[1]
+
+        self.assertEqual(first_saved_item.text,'The first (ever) list item')
+        self.assertEqual(second_saved_item.text,'Item the second')
