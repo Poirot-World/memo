@@ -1,5 +1,7 @@
 from selenium import webdriver
 import unittest
+from selenium.webdriver.common.keys import Keys
+import time
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):  #打开浏览器，在测试之前运行
         self.browser = webdriver.Chrome()
@@ -25,7 +27,7 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(any(row.text == '1:Buy peacock features' for row in rows))
+        self.assertTrue(any(row.text == '1:Buy peacock features' for row in rows),"New to-do item did not appear in table")
         # 页面中又显示了一个文本框，可以输入其他的待办事项
         #她输入了"Use peacock feathers to make a fly"
 
