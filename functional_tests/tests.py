@@ -2,7 +2,10 @@ from selenium import webdriver
 import unittest
 from selenium.webdriver.common.keys import Keys
 import time
-class NewVisitorTest(unittest.TestCase):
+from django.test import LiveServerTestCase
+
+# class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):  #打开浏览器，在测试之前运行
         self.browser = webdriver.Chrome()
     def tearDown(self) -> None:  #关闭浏览器，在测试之后运行
@@ -14,7 +17,8 @@ class NewVisitorTest(unittest.TestCase):
         self.assertIn(row_text,[row.text for row in rows])
     def test_can_start_a_list_and_retrieve_it_later(self):
         #这个网站有一个在线待办事项应用，去瞧瞧
-        self.browser.get('http://localhost:8000')
+        #self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         #发现网页的标题和头部都包含"To-Do"这个词
         self.assertIn('To-Do',self.browser.title)
         #Selenium提供查找网页内容的方法find_elements_by_tag_name
@@ -55,5 +59,5 @@ class NewVisitorTest(unittest.TestCase):
 
         self.fail('Finish the test!') #提醒测试结束了
 
-if __name__ == '__main__': #检查自己是都在命令行中运行，而不是在其他脚本中导入
-    unittest.main()
+# if __name__ == '__main__': #检查自己是都在命令行中运行，而不是在其他脚本中导入
+#     unittest.main()
