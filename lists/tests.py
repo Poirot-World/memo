@@ -29,10 +29,41 @@ class HomePageTest(TestCase):
 
     def test_can_save_a_post_request(self):
         #发送post请求，data指定想发送的表单数据
-        response = self.client.post('/',data= {'item_text':'A new list item'})
+        self.client.post('/',data= {'item_text':'A new list item'})
+        #检查视图是否把新添加的待办事项存入数据库
+        self.assertEqual(Item.objects.count(),1)
+        #objects.all()[0]
+        new_item = Item.objects.first()
+        #检查待办事项的文本是否正确
+        self.assertEqual(new_item.text,'A new list item')
         #检查post请求渲染得到的html中是否有指定的文本
-        self.assertIn('A new list item',response.content.decode())
-        self.assertTemplateUsed(response, 'home.html')  # 检查是否依然使用这个模板
+        #self.assertIn('A new list item',response.content.decode())
+        #self.assertTemplateUsed(response, 'home.html')  # 检查是否依然使用这个模板
+
+
+
+
+        # self.assertEqual(response.status_code,302)
+        # self.assertEqual(response['location'],'/')
+
+    def test_redirects_after_POST(self):
+        # 不再拿响应中的content属性值和渲染模板的值比较
+        # 现在比较重新定向
+        response = self.client.post('/',data= {'item_text':'A new list item'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
+    def test_only_saves_items_when_necessary(self):
+        self.client.get('/')
+        self.assertEqual(Item.objects.count(),0)
+
+    def test_displays_all_list_item(self):
+        Item.objects.create(text = 'itemey 1')
+        Item.objects.create(text = 'itemey 2')
+        response = self.client.get('/')
+        self.assertIn('itemey 1',response.content.decode())
+        self.assertIn('itemey 2',response.content.decode())
+
 
 
 class ItemModelTest(TestCase):
