@@ -3,13 +3,31 @@ import unittest
 from selenium.webdriver.common.keys import Keys
 import time
 from django.test import LiveServerTestCase
+from selenium.common.exceptions import WebDriverException
 
 # class NewVisitorTest(unittest.TestCase):
 class NewVisitorTest(LiveServerTestCase):
+    #等待的最长时间
+    MAX_WAIT = 10
     def setUp(self):  #打开浏览器，在测试之前运行
         self.browser = webdriver.Chrome()
     def tearDown(self) -> None:  #关闭浏览器，在测试之后运行
         self.browser.quit()
+    def wait_for_row_in_list_table(self,row_text):
+        start_time = time.time()
+        #一直循环，知道遇到两个出口中的一个为止
+        while True:
+            try:
+                table = self.browser.find_element_by_id('id_list_table')
+                rows = table.find_elements_by_tag_name('tr')
+                self.assertIn(row_text,[row.text for row in rows])
+                return #如果上面的通过了，就return
+            except (AssertionError,WebDriverException) as e:
+                #一旦捕获异常：WebDriverException：页面未加载或者selenium在页面上未找到表格元素时抛出
+                #AssertionError：没有我们找的行
+                if time.time()-start_time > MAX_WAIT:
+                    raise e
+                time.sleep(0.5)
     #赋值方法，不以test开头不会被测试
     def check_for_row_in_list_table(self,row_text):
         table = self.browser.find_element_by_id('id_list_table')
@@ -56,7 +74,8 @@ class NewVisitorTest(LiveServerTestCase):
         #self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
         #self.assertIn('2:Use peacock feathers to make a fly', [row.text for row in rows])
 
-
+        #想看到网站记住自己的清单并别生成唯一的url
+        #用户不能相互查看各自的清单，每个用户都有自己的Url，能访问自己的清单
         self.fail('Finish the test!') #提醒测试结束了
 
 # if __name__ == '__main__': #检查自己是都在命令行中运行，而不是在其他脚本中导入
