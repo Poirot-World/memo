@@ -7,13 +7,14 @@ from selenium.common.exceptions import WebDriverException
 
 # class NewVisitorTest(unittest.TestCase):
 class NewVisitorTest(LiveServerTestCase):
-    #等待的最长时间
-    MAX_WAIT = 10
+
     def setUp(self):  #打开浏览器，在测试之前运行
         self.browser = webdriver.Chrome()
     def tearDown(self) -> None:  #关闭浏览器，在测试之后运行
         self.browser.quit()
     def wait_for_row_in_list_table(self,row_text):
+        # 等待的最长时间
+        MAX_WAIT = 10
         start_time = time.time()
         #一直循环，知道遇到两个出口中的一个为止
         while True:

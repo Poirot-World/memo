@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,re_path
 from lists import views
 #url条目的前半部分是正则表达式，例如'admin/'，定义适用于哪些url。
 #后半部分说明把请求发给何处：发给导入的view函数，例如上面的views.home，或者其他的url.py文件，例如blogs.urls
@@ -24,6 +24,6 @@ from lists import views
 #     path('admin/', admin.site.urls),
 # ]
 
-urlpatterns = [path('', views.home_page, name='home'),
-               path('lists/new',views.new_list,name='new_list'),
-               path('lists/the-only-list-in-the-world/',views.view_list,name='view_list')]
+urlpatterns = [re_path(r'^$', views.home_page, name='home'),
+               re_path(r'^lists/new$',views.new_list,name='new_list'),
+               re_path(r'^lists/(.+)/$',views.view_list,name='view_list'),]
