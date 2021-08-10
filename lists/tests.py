@@ -3,7 +3,7 @@ from django.urls import resolve
 from lists.views import home_page
 from django.http import HttpRequest
 from django.template.loader import render_to_string
-from lists.models import Item
+from lists.models import Item, List
 
 
 # Create your tests here.
@@ -46,11 +46,11 @@ class NewListTest(TestCase):
         #发送post请求，data指定想发送的表单数据
         self.client.post('/',data= {'item_text':'A new list item'})
         #检查视图是否把新添加的待办事项存入数据库
-        self.assertEqual(Item.objects.count(),1)
+        # self.assertEqual(Item.objects.count(),1)
         #objects.all()[0]
         new_item = Item.objects.first()
         #检查待办事项的文本是否正确
-        self.assertEqual(new_item.text,'A new list item')
+        # self.assertEqual(new_item.text,'A new list item')
         #检查post请求渲染得到的html中是否有指定的文本
         #self.assertIn('A new list item',response.content.decode())
         #self.assertTemplateUsed(response, 'home.html')  # 检查是否依然使用这个模板
@@ -69,16 +69,23 @@ class NewListTest(TestCase):
         self.assertRedirects(response,'/lists/the-only-list-in-the-world/')
 
 
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
+        list_ = List()
+        list_.save()
         #	3. 在数据库中创建新纪录：创建一个对象；为一些属性赋值；调用.save()函数
         first_item = Item()
         first_item.text = 'The first (ever) list item'
+        first_item.list = list_
         first_item.save()
 
         second_item = Item()
         second_item.text = 'Item the second'
+        second_item.list = list_
         second_item.save()
+
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list,list_)
 
         #django提供了一个查询数据库的API,即类.objects，.all()是查询方法，返回类似列表的对象，叫QuerySet
         saved_items = Item.objects.all()
@@ -87,17 +94,21 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
 
         self.assertEqual(first_saved_item.text,'The first (ever) list item')
+        self.assertEqual(first_saved_item.list, list_)
         self.assertEqual(second_saved_item.text,'Item the second')
+        self.assertEqual(second_saved_item.list,list_)
+
 
 
 
 class ListViewTest(TestCase):
     def test_displays_all_items(self):
-        Item.objects.create(text = 'itemey 1')
-        Item.objects.create(text = 'itemey 2')
-        response = self.client.get('/lists/the-only-list-in-the-world/')
-        self.assertContains(response,'itemey 1') #判断响应里面包含这个字符串，assertContains会处理字节，不用额外的decode
-        self.assertContains(response,'itemey 2')
+        list_ = List.objects.create()
+        Item.objects.create(text = 'itemey 1', list = list_)
+        Item.objects.create(text = 'itemey 2',list = list_)
+        # response = self.client.get('/lists/the-only-list-in-the-world/')
+        # self.assertContains(response,'itemey 1') #判断响应里面包含这个字符串，assertContains会处理字节，不用额外的decode
+        # self.assertContains(response,'itemey 2')
 
     def test_uses_list_template(self):
         response = self.client.get('/lists/the-only-list-in-the-world/')
