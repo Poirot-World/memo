@@ -27,7 +27,22 @@ class HomePageTest(TestCase):
         # self.assertTrue(html.endswith('</html>'))#希望响应以</html>标签结尾
         self.assertTemplateUsed(response,'home.html') #assertTemplateUsed用于检查响应是哪个模板渲染的
 
-    def test_can_save_a_post_request(self):
+
+
+    def test_only_saves_items_when_necessary(self):
+        self.client.get('/')
+        self.assertEqual(Item.objects.count(),0)
+
+    # def test_displays_all_list_item(self):
+    #     Item.objects.create(text = 'itemey 1')
+    #     Item.objects.create(text = 'itemey 2')
+    #     response = self.client.get('/')
+    #     self.assertIn('itemey 1',response.content.decode())
+    #     self.assertIn('itemey 2',response.content.decode())
+
+
+class NewListTest(TestCase):
+    def test_can_save_a_POST_request(self):
         #发送post请求，data指定想发送的表单数据
         self.client.post('/',data= {'item_text':'A new list item'})
         #检查视图是否把新添加的待办事项存入数据库
@@ -47,24 +62,11 @@ class HomePageTest(TestCase):
     def test_redirects_after_POST(self):
         # 不再拿响应中的content属性值和渲染模板的值比较
         # 现在比较重新定向
-        response = self.client.post('/',data= {'item_text':'A new list item'})
+        response = self.client.post('/lists/new',data= {'item_text':'A new list item'})
         self.assertEqual(response.status_code, 302)
         # self.assertEqual(response['location'], '/')
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-
-    def test_only_saves_items_when_necessary(self):
-        self.client.get('/')
-        self.assertEqual(Item.objects.count(),0)
-
-    # def test_displays_all_list_item(self):
-    #     Item.objects.create(text = 'itemey 1')
-    #     Item.objects.create(text = 'itemey 2')
-    #     response = self.client.get('/')
-    #     self.assertIn('itemey 1',response.content.decode())
-    #     self.assertIn('itemey 2',response.content.decode())
-
-
-
+        # self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
+        self.assertRedirects(response,'/lists/the-only-list-in-the-world/')
 
 
 class ItemModelTest(TestCase):

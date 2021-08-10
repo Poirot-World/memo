@@ -21,10 +21,10 @@ def home_page(request):
     # return render(request,'home.html',{'new_item_text':request.POST.get('item_text',''),})
 #dic.get用法：如果字典里没有指定"item_text"，那么返回''
 
-    #视图函数处理完post请求会重新定向
-    if request.method == 'POST':
-        Item.objects.create(text=request.POST['item_text'])
-        return redirect('/lists/the-only-list-in-the-world/')
+    # #视图函数处理完post请求会重新定向
+    # if request.method == 'POST':
+    #     Item.objects.create(text=request.POST['item_text'])
+    #     return redirect('/lists/the-only-list-in-the-world/')
 
     return render(request,'home.html')
 
@@ -33,3 +33,6 @@ def view_list(request):
 
     return render(request, 'list.html', {'items': items})
 
+def new_list(request):
+    Item.objects.create(text=request.POST['item_text'])
+    return redirect('/lists/the-only-list-in-the-world/')
