@@ -25,14 +25,16 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError,WebDriverException) as e:
                 #一旦捕获异常：WebDriverException：页面未加载或者selenium在页面上未找到表格元素时抛出
                 #AssertionError：没有我们找的行
-                if time.time()-start_time > MAX_WAIT:
+                if time.time() - start_time > MAX_WAIT:
                     raise e
                 time.sleep(0.5)
+
     #赋值方法，不以test开头不会被测试
     def check_for_row_in_list_table(self,row_text):
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(row_text,[row.text for row in rows])
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         #这个网站有一个在线待办事项应用，去瞧瞧
         #self.browser.get('http://localhost:8000')
