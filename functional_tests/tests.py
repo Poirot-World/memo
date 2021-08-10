@@ -78,5 +78,45 @@ class NewVisitorTest(LiveServerTestCase):
         #用户不能相互查看各自的清单，每个用户都有自己的Url，能访问自己的清单
         self.fail('Finish the test!') #提醒测试结束了
 
+    def test_can_start_a_list_for_one_user(self):
+        self.wait_for_row_in_list_table('2:Use peacock feathers to make a fly')
+        self.wait_for_row_in_list_table('1:Buy peacock feathers')
+
+    def test_multiple_users_can_start_lists_at_different_urls(self):
+        #新建一个待办事项
+        self.browser.get(self.live_server_url)
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy peacock feathers')
+        inputbox.send_keys(Keys.ENTER)
+
+        self.wait_for_row_in_list_table('1:Buy peacock feathers')
+        #清单有唯一的url
+        edith_list_url = self.browser.current_url
+        #检车字符串是否匹配正则表达式
+        self.assertRegex(edith_list_url,'/lists/.+')
+
+        self.browser.quit()
+        #新用户弗朗西斯访问了网站
+        #使用一个新的浏览器会话
+        self.browser = webdriver.Chrome()
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        #页面中看不到edith的清单
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly',page_text)
+        #弗朗西斯输入一个新的待办事项，新建一个清单
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1:Buy milk')
+        #弗朗西斯获得了他唯一的url
+        francis_list_url = self.browser.current_url
+        self.assertRegex(francis_list_url,'/lists/.+')
+        self.assertNotEqual(francis_list_url,edith_list_url)
+        #弗朗西斯这个页面也没有edith的清单
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
 # if __name__ == '__main__': #检查自己是都在命令行中运行，而不是在其他脚本中导入
 #     unittest.main()

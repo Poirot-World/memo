@@ -41,8 +41,6 @@ class HomePageTest(TestCase):
         #self.assertTemplateUsed(response, 'home.html')  # 检查是否依然使用这个模板
 
 
-
-
         # self.assertEqual(response.status_code,302)
         # self.assertEqual(response['location'],'/')
 
@@ -63,6 +61,8 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertIn('itemey 1',response.content.decode())
         self.assertIn('itemey 2',response.content.decode())
+
+
 
 
 
