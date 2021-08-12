@@ -106,7 +106,7 @@ class ListViewTest(TestCase):
     def test_uses_list_template(self):
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        # self.assertTemplateUsed(response,'list.html')
+        self.assertTemplateUsed(response,'list.html')
 
 
     def test_displays_only_items_for_that_list(self):
@@ -121,15 +121,22 @@ class ListViewTest(TestCase):
 
 
         response = self.client.get(f'/lists/{correct_list.id}/')
-        self.assertContains(response,'itemey 1') #判断响应里面包含这个字符串，assertContains会处理字节，不用额外的decode
-        self.assertContains(response,'itemey 2')
+        # self.assertContains(response,'itemey 1') #判断响应里面包含这个字符串，assertContains会处理字节，不用额外的decode
+        # self.assertContains(response,'itemey 2')
         self.assertNotContains(response, 'other list item 1')
         self.assertNotContains(response, 'other list item 2')
+
+    def test_passes_correct_list_to_template(self):
+        other_list = List.objects.create()
+        correct_list = List.objects.create()
+        response = self.client.get(f'/lists/{correct_list.id}/')
+        #response.context表示要传入render函数的上下文
+        self.assertEqual(response.context['list'],correct_list)
 
 
 
 class NewItemTest(TestCase):
-    def test_can_save_a_POST_request_to_existing_list(self):
+    def test_can_save_a_POST_request_to_an_existing_list(self):
         other_list = List.objects.create()
         correct_list = List.objects.create()
         self.client.post(f'/lists/{correct_list.id}/add_item',

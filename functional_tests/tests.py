@@ -79,11 +79,11 @@ class NewVisitorTest(LiveServerTestCase):
 
         #想看到网站记住自己的清单并别生成唯一的url
         #用户不能相互查看各自的清单，每个用户都有自己的Url，能访问自己的清单
-        self.fail('Finish the test!') #提醒测试结束了
+        # self.fail('Finish the test!') #提醒测试结束了
 
-    def test_can_start_a_list_for_one_user(self):
-        self.wait_for_row_in_list_table('2:Use peacock feathers to make a fly')
-        self.wait_for_row_in_list_table('1:Buy peacock feathers')
+    # def test_can_start_a_list_for_one_user(self):
+    #     self.wait_for_row_in_list_table('2:Use peacock feathers to make a fly')
+    #     self.wait_for_row_in_list_table('1:Buy peacock feathers')
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
         #新建一个待办事项
